@@ -50,4 +50,8 @@ public class StoreService {
     public List<Store> selectAll() {
         return storeMapper.selectList(null);
     }
+
+    public Store selectById(Long id) {
+        return storeMapper.selectById(id);
+    }
 }
