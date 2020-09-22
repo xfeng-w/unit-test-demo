@@ -5,7 +5,6 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-@MapperScan("com.xfeng.unit.mapper")
 class DemoApplicationTests {
 
     @Test

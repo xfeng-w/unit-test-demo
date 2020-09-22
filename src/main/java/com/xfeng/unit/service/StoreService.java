@@ -46,4 +46,8 @@ public class StoreService {
 
         return stores;
     }
+
+    public List<Store> selectAll() {
+        return storeMapper.selectList(null);
+    }
 }

@@ -2,29 +2,34 @@ package com.xfeng.unit.controller;
 
 import com.xfeng.unit.model.entity.Store;
 import com.xfeng.unit.service.StoreService;
-import org.hamcrest.Matchers;
+import com.xfeng.unit.util.JacksonUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 /**
  * @author xuefeng.wang
- * @date 2020-09-21
+ * @date 2020-09-22
  */
 @RunWith(SpringRunner.class)
-@WebMvcTest(value = StoreController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class StoreControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -32,11 +37,22 @@ class StoreControllerTest {
     private StoreService storeService;
 
     @Test
+    void selectAll() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/portal/store/v1"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
     void sync() throws Exception {
         Store store = new Store();
-        Mockito.when(storeService.sync(Collections.singletonList(store))).thenReturn(Collections.singletonList(store));
-        mockMvc.perform(MockMvcRequestBuilders.post("portal/store/v1"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("杭州")));
+        store.setCreatedTime(new Date());
+        store.setUpdatedTime(new Date());
+        store.setCode("test");
+        store.setName("test");
+        store.setTel("13456859845");
+        List<Store> storeList = Collections.singletonList(store);
+        String content = JacksonUtils.write2JsonString(storeList);
+        mockMvc.perform(post("/portal/store/v1").contentType(MediaType.APPLICATION_JSON_UTF8).content(content)).andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
